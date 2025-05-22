@@ -32,7 +32,7 @@
 
 @keyframes arrowMove {
   0% { transform: translateX(0);}
-  100% { transform: translateX(10px);}
+  100% { transform: translateX(30px);}
 }
 
 .convert-btn {
@@ -48,4 +48,10 @@
 
 .convert-btn:hover {
   background: #0056b3;
+}
+
+.nav-links .nav-icon {
+  font-size: 2em;
+  margin: 0 0.5em;
+  vertical-align: middle;
 }

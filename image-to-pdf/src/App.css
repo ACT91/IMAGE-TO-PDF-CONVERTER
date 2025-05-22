@@ -1,12 +1,189 @@
+/* ====== ROOT VARIABLES ====== */
+:root {
+  --header-bg: #fff;
+  --header-title-color: #007bff;
+  --nav-link-color: #22223b;
+  --container-bg: #f5f5f5;
+  --convert-btn-bg: #007bff;
+  --convert-btn-color: #fff;
+  --header-shadow: 0 2px 8px #0001;
+  --nav-link-hover: #007bff;
+  --nav-link-active: #0056b3;
+  --nav-link-shadow: 0 2px 8px #007bff22;
+  --gradient-title: linear-gradient(90deg, #0004ff 0%, #00c6ff 100%);
+  --gradient-title-dark: linear-gradient(90deg, #fff 0%, #ffb300 100%);
+  --theme-sun: #ffb300;
+  --theme-moon: #22223b;
+  --menu-bar-bg: #007bff;
+}
+
+body.dark-theme {
+  --header-bg: #23263a;
+  --header-title-color: #ffb300;
+  --nav-link-color: #e0e7ff;
+  --container-bg: #23263a;
+  --convert-btn-bg: #22223b;
+  --convert-btn-color: #fff;
+  --header-shadow: 0 2px 8px #0008;
+  --nav-link-hover: #ffb300;
+  --nav-link-active: #ffb300;
+  --gradient-title: var(--gradient-title-dark);
+  --theme-sun: #ffb300;
+  --theme-moon: #fff;
+  --menu-bar-bg: #ffb300;
+}
+
+html, body {
+  background: var(--container-bg);
+  transition: background 0.3s;
+  min-height: 100vh;
+}
+
+/* ====== HEADER ====== */
+.header {
+  width: 100%;
+  background: var(--header-bg);
+  color: var(--header-title-color);
+  box-shadow: var(--header-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.header-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--header-title-color);
+  letter-spacing: 1px;
+}
+
+/* ====== NAVIGATION ====== */
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: var(--nav-link-color);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: var(--nav-link-hover);
+}
+
+.nav-links .nav-icon {
+  margin-left: 0.5em;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+.nav-links .active-link {
+  color: var(--nav-link-active) !important;
+  text-shadow: var(--nav-link-shadow);
+}
+
+/* ====== MENU TOGGLE ====== */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  margin-left: 1rem;
+}
+
+.menu-bar {
+  width: 26px;
+  height: 3px;
+  background: var(--menu-bar-bg);
+  border-radius: 2px;
+  display: block;
+}
+
+/* ====== MOBILE NAV ====== */
+@media (max-width: 700px) {
+  .header {
+    flex-wrap: wrap;
+    padding: 0.7rem 1rem;
+  }
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 50vw;
+    max-width: 350px;
+    background: rgba(255,255,255,0.98);
+    flex-direction: column;
+    gap: 2.2rem;
+    box-shadow: -4px 0 16px #0002;
+    padding: 4rem 2rem 2rem 2rem;
+    border-radius: 0 0 0 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    z-index: 100;
+    transform: translateX(100%);
+    opacity: 0;
+    padding-top: 8rem; 
+    text-align: center; 
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(.77,0,.18,1), opacity 0.3s;
+  }
+  .nav-links.open {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .nav-links a {
+    font-size: 1.3rem;
+    color: var(--nav-link-hover);
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+  .menu-toggle {
+    display: flex;
+    z-index: 200;
+  }
+  .close-menu {
+    position: absolute;
+    top: .9rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    color: var(--nav-link-hover);
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 201;
+    transition: color 0.2s;
+  }
+  .close-menu:hover {
+    color: #ff0000;
+  }
+}
+
+/* ====== MAIN CONTAINER ====== */
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #f5f5f5;
+  margin-top: 80px; /* To prevent header overlap */
 }
 
+/* ====== ANIMATION ====== */
 .animation-wrapper {
   display: flex;
   align-items: center;
@@ -35,11 +212,12 @@
   100% { transform: translateX(10px);}
 }
 
+/* ====== BUTTONS ====== */
 .convert-btn {
   padding: 1rem 2rem;
   font-size: 1.2rem;
-  background: #007bff;
-  color: #fff;
+  background: var(--convert-btn-bg);
+  color: var(--convert-btn-color);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -47,5 +225,103 @@
 }
 
 .convert-btn:hover {
-  background: #0056b3;
+  background: var(--convert-btn-hover);
+}
+
+/* ====== GRADIENT TITLE ====== */
+.gradient-title {
+  background: var(--gradient-title);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 500px) {
+  .gradient-title {
+    display: block;
+    text-align: left;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+  }
+  .gradient-title::after {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background: var(--gradient-title);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-top: 2px;
+  }
+}
+
+@media (max-width: 500px) {
+  .converter-word {
+    display: block;
+    margin-top: 2px;
+  }
+}
+
+/* ====== THEME TOGGLE ====== */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  font-size: 1.7em;
+  transition: color 0.2s;
+}
+
+.theme-toggle:focus {
+  outline: 2px solid var(--nav-link-hover);
+}
+
+.theme-icon {
+  transition: transform 0.4s cubic-bezier(.77,0,.18,1), color 0.3s;
+}
+
+.theme-icon.sun {
+  color: var(--theme-sun);
+  transform: rotate(0deg) scale(1.1);
+}
+
+.theme-icon.moon {
+  color: var(--theme-moon);
+  transform: rotate(-20deg) scale(1.1);
+}
+
+.theme-toggle-fab {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  z-index: 300;
+  background: var(--header-bg);
+  color: var(--theme-sun);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 16px #0002;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.theme-toggle-fab:hover {
+  background: var(--nav-link-hover);
+  color: #fff;
+}
+
+.theme-toggle-fab:focus {
+  outline: 2px solid var(--nav-link-hover);
 }
