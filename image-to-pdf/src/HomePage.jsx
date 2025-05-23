@@ -1,9 +1,9 @@
-import './App.css'
+import './HomePage.css'
 import { useNavigate, NavLink } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { MdHome, MdSave, MdInfo, MdSettings, MdDarkMode, MdLightMode } from 'react-icons/md'
 
-function App() {
+function HomePage() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dark, setDark] = useState(() => {
@@ -84,4 +84,4 @@ function App() {
   )
 }
 
-export default App
+export default HomePage
