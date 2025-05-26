@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import HomePage from './HomePage'
+import HomePage from './HomePage.tsx'
 import ConvertPage from '../pages/Converter/ConvertPage'
 import './HomePage.css'
 

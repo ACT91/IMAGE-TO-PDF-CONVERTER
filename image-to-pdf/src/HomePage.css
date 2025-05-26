@@ -89,3 +89,116 @@ html, body {
 }
 
 /* Add your other styles as needed */
+.theme-toggle-fab {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  z-index: 300;
+  background: var(--header-bg);
+  color: var(--header-title-color);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 16px #0002;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.theme-toggle-fab:hover {
+  background: var(--header-title-color);
+  color: var(--header-bg);
+}
+
+.theme-toggle-fab:focus {
+  outline: 2px solid var(--header-title-color);
+}
+
+.theme-icon {
+  transition: transform 0.4s cubic-bezier(.77,0,.18,1), color 0.3s;
+}
+
+.theme-icon.sun {
+  color: #ffb300;
+  transform: rotate(0deg) scale(1.1);
+}
+
+.theme-icon.moon {
+  color: #22223b;
+  transform: rotate(-20deg) scale(1.1);
+}
+
+body.dark-theme .theme-icon.moon {
+  color: #fff;
+}
+
+
+@media (max-width: 700px) {
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 50vw;
+    max-width: 350px;
+    background: var(--header-bg);
+    flex-direction: column;
+    gap: 2.2rem;
+    box-shadow: -4px 0 16px #0002;
+    padding: 4rem 2rem 2rem 2rem;
+    border-radius: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    z-index: 100;
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(.77,0,.18,1), opacity 0.3s;
+  }
+  .nav-links.open {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .nav-links .nav-icon {
+    font-size: 2.5em;
+  }
+  .menu-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 200;
+    margin-left: 1rem;
+  }
+  .menu-bar {
+    width: 26px;
+    height: 3px;
+    background: var(--header-title-color);
+    border-radius: 2px;
+    display: block;
+  }
+  .close-menu {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    color: var(--header-title-color);
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 201;
+    transition: color 0.2s;
+  }
+  .close-menu:hover {
+    color: #ff0000;
+  }
+}
