@@ -1,12 +1,16 @@
 import { Routes, Route } from 'react-router-dom';
 import HomePage from './HomePage';
 import ConvertPage from '../pages/Converter/ConvertPage';
+import { useTheme } from './ThemeProvider';
 
 const App = () => {
+  const { theme } = useTheme();
+  const darkMode = theme === 'dark';
+
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/convert" element={<ConvertPage />} />
+      <Route path="/convert" element={<ConvertPage darkMode={darkMode} />} />
     </Routes>
   );
 };

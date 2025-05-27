@@ -1,10 +1,32 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/src/assets/pdf-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <title>IMAGE TO PDF CONVERTER</title>
+    <!-- Force light mode -->
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#ffffff">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Convert your images to high-quality PDF documents with just one click. Free online image to PDF converter tool." />
+    <meta name="keywords" content="image to pdf, pdf converter, image converter, online converter, free pdf tool" />
+    <!-- Open Graph Meta Tags (for social sharing) -->
+    <meta property="og:title" content="IMAGE TO PDF CONVERTER" />
+    <meta property="og:description" content="Convert your images to high-quality PDF documents with just one click." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.jpg" />
+    <!-- Prevent auto dark mode -->
+    <style>
+      html {
+        color-scheme: light !important;
+      }
+      @media (prefers-color-scheme: dark) {
+        html {
+          color-scheme: light !important;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

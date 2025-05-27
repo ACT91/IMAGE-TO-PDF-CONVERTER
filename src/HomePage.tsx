@@ -1,36 +1,32 @@
 import { useNavigate, NavLink } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { MdHome, MdSave, MdInfo, MdSettings, MdDarkMode, MdLightMode } from 'react-icons/md'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faImage, faFilePdf } from '@fortawesome/free-solid-svg-icons';
-import './styles/animations.css';
+import { useTheme } from './ThemeProvider'
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const [dark, setDark] = useState<boolean>(() => {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  }, [dark]);
-
-  const handleThemeToggle = () => {
-    setDark(d => !d);
-    // Add a quick flash effect when changing theme
-    document.documentElement.style.transition = 'background-color 0.5s ease';
-    setTimeout(() => {
-      document.documentElement.style.transition = '';
-    }, 500);
-  };
-
+  const { theme, toggleTheme: toggleThemeContext } = useTheme();
+  const darkMode = theme === 'dark';
+  
+  function toggleTheme(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    event.preventDefault();
+    toggleThemeContext();
+  }
+  
   return (
-    <div className="min-h-screen bg-base-100 transition-colors duration-300">
-      <header className="navbar bg-base-200 px-4 shadow-lg transition-all duration-300">
+    <div className="min-h-screen" 
+         style={{ backgroundColor: darkMode ? '#000000' : '#ffffff' }}>
+      <header className="navbar"
+              style={{ backgroundColor: darkMode ? '#000000' : '#ffffff' }}>
         <div className="flex-1">
-          <span className="text-2xl font-bold bg-gradient-to-r from-[#007bff] to-[#800000] bg-clip-text text-transparent">
-            IMAGE TO PDF <span className="text-[#800000]">CONVERTER</span>
+          <span className="text-2xl font-bold">
+            <span style={{ color: darkMode ? '#ff0000' : '#007bff' }}>
+              IMAGE TO PDF
+            </span>{" "}
+            <span style={{ color: darkMode ? '#ffffff' : '#000000' }}>
+              CONVERTER
+            </span>
           </span>
         </div>
         
@@ -46,9 +42,13 @@ const HomePage: React.FC = () => {
               <NavLink 
                 key={item.to}
                 to={item.to} 
-                className={({ isActive }) => 
-                  `btn btn-ghost btn-circle ${isActive ? 'bg-[#007bff]/20 text-[#007bff]' : ''}`
-                }
+                className="btn btn-ghost btn-circle"
+                style={({ isActive }) => ({
+                  backgroundColor: isActive ? (darkMode ? 'rgba(255,0,0,0.2)' : 'rgba(0,123,255,0.2)') : 'transparent',
+                  color: isActive 
+                    ? (darkMode ? '#ff0000' : '#007bff')
+                    : (darkMode ? '#ffffff' : '#000000')
+                })}
               >
                 {item.icon}
               </NavLink>
@@ -61,97 +61,104 @@ const HomePage: React.FC = () => {
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
-            {menuOpen ? (
-              <svg className="w-6 h-6 text-[#007bff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6 text-[#007bff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
+            <svg className="w-6 h-6" 
+                 fill="none" 
+                 stroke={darkMode ? '#ff0000' : '#007bff'} 
+                 viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
 
           {/* Mobile Menu Backdrop */}
           {menuOpen && (
             <div 
-              className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm md:hidden z-40"
               onClick={() => setMenuOpen(false)}
             />
           )}
 
-          {/* Mobile Dropdown Menu */}
+          {/* Mobile Menu */}
           <div className={`
             fixed top-0 right-0 
             w-64 h-screen
-            bg-white dark:bg-gray-800
-            shadow-xl dark:shadow-2xl
-            transition-all duration-300 transform
+            shadow-xl
+            transform
             md:hidden
-            flex flex-col items-center justify-center gap-8
+            flex flex-col items-stretch
             z-50
             ${menuOpen ? 'translate-x-0' : 'translate-x-full'}
-          `}>
+          `}
+          style={{ 
+            backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
+            boxShadow: darkMode ? '0 20px 25px -5px rgba(255,255,255,0.1)' : '0 20px 25px -5px rgba(0,0,0,0.1)'
+          }}>
+            {/* Add Close Button */}
             <button
-              className="absolute top-4 right-4 btn btn-ghost btn-circle dark:hover:bg-gray-700"
+              className="absolute top-4 right-4 p-2 rounded-full"
               onClick={() => setMenuOpen(false)}
+              aria-label="Close menu"
+              style={{ 
+                color: darkMode ? '#ff0000' : '#007bff',
+                backgroundColor: darkMode ? 'rgba(75,85,99,0.2)' : 'rgba(243,244,246,0.7)'
+              }}
             >
-              <svg className="w-6 h-6 text-[#007bff] dark:text-[#80b3ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            {[
-              { to: "/", icon: <MdHome className="w-8 h-8" />, label: "Home" },
-              { to: "/saved", icon: <MdSave className="w-8 h-8" />, label: "Saved" },
-              { to: "/about", icon: <MdInfo className="w-8 h-8" />, label: "About" },
-              { to: "/settings", icon: <MdSettings className="w-8 h-8" />, label: "Settings" }
-            ].map((item) => (
-              <NavLink 
-                key={item.to}
-                to={item.to} 
-                className={({ isActive }) => `
-                  btn btn-ghost btn-circle w-16 h-16
-                  ${isActive ? 
-                    'text-[#007bff] dark:text-[#80b3ff] bg-[#007bff]/5 dark:bg-[#80b3ff]/10' : 
-                    'text-gray-700 dark:text-gray-300'
-                  }
-                  dark:hover:bg-gray-700
-                `}
-                onClick={() => setMenuOpen(false)}
-              >
-                {item.icon}
-              </NavLink>
-            ))}
+            {/* Menu Items - adjust top padding to account for close button */}
+            <div className="pt-16 flex flex-col items-stretch">
+              {[
+                { to: "/", label: "Home" },
+                { to: "/saved", label: "Saved" },
+                { to: "/about", label: "About" },
+                { to: "/settings", label: "Settings" }
+              ].map((item) => (
+                <NavLink 
+                  key={item.to}
+                  to={item.to} 
+                  className="px-8 py-4 text-lg font-medium"
+                  style={({ isActive }) => ({
+                    color: isActive 
+                      ? (darkMode ? '#ff0000' : '#007bff')
+                      : (darkMode ? '#ffffff' : '#000000'),
+                    backgroundColor: isActive
+                      ? (darkMode ? 'rgba(255,0,0,0.1)' : 'rgba(0,123,255,0.1)')
+                      : 'transparent'
+                  })}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-12">
-        <div className="flex flex-col items-center gap-12">
-          
-        
-
+      <main className="container mx-auto px-4 flex items-center justify-center min-h-[calc(100vh-4rem)]"
+            style={{ backgroundColor: darkMode ? '#000000' : '#ffffff' }}>
+        <div className="flex flex-col items-center gap-12 -mt-20">
           <div className="text-center space-y-4">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-[#007bff] to-[#800000] bg-clip-text text-transparent">
+            <h1 className="text-5xl font-bold"
+                style={{ color: darkMode ? '#ff0000' : '#007bff' }}>
               Transform Images to PDFs
             </h1>
-            <p className="text-xl opacity-80 max-w-2xl">
-              Convert your images to high-quality PDF documents with just one click. Fast, secure, and easy to use.
+            <p className="text-xl opacity-80 max-w-2xl"
+               style={{ color: darkMode ? '#ffffff' : '#000000' }}>
+              Convert your images to high-quality PDF documents with just one click.
             </p>
           </div>
 
           <button
-            className="convert-btn btn bg-[#007bff] hover:bg-[#0056b3] text-white btn-lg px-8 py-4 text-lg font-bold transition-all duration-300"
-            onClick={() => {
-              navigate('/convert');
-              // Add ripple effect
-              const button = document.querySelector('.convert-btn');
-              if (button) {
-                button.classList.add('animate-pulse');
-                setTimeout(() => button.classList.remove('animate-pulse'), 500);
-              }
+            className="btn px-8 py-4 text-lg font-bold text-white"
+            style={{ 
+              backgroundColor: darkMode ? '#ff0000' : '#007bff',
+              borderColor: darkMode ? '#cc0000' : '#0056b3'
             }}
+            onClick={() => navigate('/convert')}
           >
             START CONVERTING NOW
           </button>
@@ -159,11 +166,14 @@ const HomePage: React.FC = () => {
       </main>
 
       <button
-        className="btn btn-circle btn-lg fixed bottom-8 right-8 shadow-xl transition-all hover:scale-110 hover:shadow-2xl"
-        onClick={handleThemeToggle}
+        className="btn btn-circle btn-lg fixed bottom-17 right-8 text-white shadow-xl"
+        style={{ 
+          backgroundColor: darkMode ? '#ff0000' : '#007bff'
+        }}
+        onClick={toggleTheme}
         aria-label="Toggle theme"
       >
-        {dark ? (
+        {darkMode ? (
           <MdLightMode className="w-6 h-6" />
         ) : (
           <MdDarkMode className="w-6 h-6" />
