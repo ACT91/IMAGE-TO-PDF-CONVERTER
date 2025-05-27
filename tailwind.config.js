@@ -13,6 +13,7 @@ module.exports = {
 =======
 >>>>>>> recovery-branch
   darkMode: 'class', // Use class strategy for dark mode
+  darkMode: 'class', // Use class strategy for dark mode
   theme: {
     extend: {},
   },
@@ -27,4 +28,13 @@ module.exports = {
 >>>>>>> recovery-branch
 =======
 >>>>>>> recovery-branch
+    extend: {},
+  },
+  plugins: [
+    require('daisyui')
+  ],
+  daisyui: {
+    themes: ["light", "dark"],
+    darkTheme: "dark" ,
+  }
 }

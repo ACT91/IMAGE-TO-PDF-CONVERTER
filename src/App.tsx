@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import HomePage from './HomePage';
 import ConvertPage from '../pages/Converter/ConvertPage';
+import { useTheme } from './ThemeProvider';
 
 const App = () => {
   const { theme } = useTheme();
@@ -10,7 +11,7 @@ const App = () => {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/convert" element={<ConvertPage />} />
+      <Route path="/convert" element={<ConvertPage darkMode={darkMode} />} />
     </Routes>
   );
 };

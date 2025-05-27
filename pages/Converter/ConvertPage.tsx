@@ -18,10 +18,11 @@ const paperSizes: PaperSize[] = [
 interface ConvertPageProps {
   darkMode: boolean;
 }
-const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode }) => {
+
+const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode: propDarkMode }) => {
   const { theme } = useTheme();
   const darkMode = theme === 'dark';
-
+  
   const [images, setImages] = useState<File[]>([])
   const [paperSize, setPaperSize] = useState<string>('a4')
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait')
