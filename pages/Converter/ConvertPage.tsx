@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react'
 import { jsPDF } from 'jspdf'
 
@@ -13,7 +14,11 @@ const paperSizes: PaperSize[] = [
   { label: 'Legal', value: 'legal' },
 ]
 
-const ConvertPage: React.FC = () => {
+interface ConvertPageProps {
+  darkMode: boolean;
+}
+
+const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode }) => {
   const [images, setImages] = useState<File[]>([])
   const [paperSize, setPaperSize] = useState<string>('a4')
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait')
