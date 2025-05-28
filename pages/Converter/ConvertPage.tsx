@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react'
 import { jsPDF } from 'jspdf'
+import { useTheme } from '../../src/ThemeProvider'
 
 interface PaperSize {
   label: string;
@@ -18,7 +19,14 @@ interface ConvertPageProps {
   darkMode: boolean;
 }
 
+<<<<<<< HEAD
 const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode }) => {
+=======
+const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode: propDarkMode }) => {
+  const { theme } = useTheme();
+  const darkMode = theme === 'dark';
+  
+>>>>>>> recovery-branch
   const [images, setImages] = useState<File[]>([])
   const [paperSize, setPaperSize] = useState<string>('a4')
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait')
@@ -104,14 +112,23 @@ const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode }) => {
     setShowModal(false)
   }
 
+  // Theme-specific styles
+  const primaryColor = darkMode ? '#ff0000' : '#007bff';
+  const primaryHoverColor = darkMode ? '#cc0000' : '#0056b3';
+  const textColor = darkMode ? '#ffffff' : '#000000';
+  const bgColor = darkMode ? '#000000' : '#ffffff';
+  const secondaryBgColor = darkMode ? '#1a1a1a' : '#f8f9fa';
+
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-3xl font-bold text-center mb-8">Convert Image to PDF</h2>
-      
-      <div className="max-w-xl mx-auto space-y-6">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center" style={{ backgroundColor: bgColor }}>
+      <div className="w-full max-w-xl mx-auto space-y-6 p-6 rounded-xl shadow-lg" style={{ backgroundColor: secondaryBgColor }}>
+        <h2 className="text-3xl font-bold text-center mb-8" style={{ color: primaryColor }}>
+          Convert Image to PDF
+        </h2>
+        
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Choose Images</span>
+            <span className="label-text" style={{ color: textColor }}>Choose Images</span>
           </label>
           <input
             type="file"
@@ -119,6 +136,7 @@ const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode }) => {
             multiple
             onChange={handleImageChange}
             className="file-input file-input-bordered w-full"
+            style={{ borderColor: primaryColor }}
             aria-label="Choose images to convert"
             title="Select one or more images to convert to PDF"
           />
@@ -126,10 +144,11 @@ const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode }) => {
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Paper Size</span>
+            <span className="label-text" style={{ color: textColor }}>Paper Size</span>
           </label>
           <select 
             className="select select-bordered w-full"
+            style={{ borderColor: primaryColor, color: textColor }}
             value={paperSize} 
             onChange={e => setPaperSize(e.target.value)}
             aria-label="Select paper size"
@@ -143,10 +162,11 @@ const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode }) => {
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Orientation</span>
+            <span className="label-text" style={{ color: textColor }}>Orientation</span>
           </label>
           <select 
             className="select select-bordered w-full"
+            style={{ borderColor: primaryColor, color: textColor }}
             value={orientation} 
             onChange={e => setOrientation(e.target.value as 'portrait' | 'landscape')}
             aria-label="Select page orientation"
@@ -159,8 +179,8 @@ const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode }) => {
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Image Quality</span>
-            <span className="label-text-alt">{Math.round(quality * 100)}%</span>
+            <span className="label-text" style={{ color: textColor }}>Image Quality</span>
+            <span className="label-text-alt" style={{ color: textColor }}>{Math.round(quality * 100)}%</span>
           </label>
           <input
             type="range"
@@ -169,14 +189,22 @@ const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode }) => {
             step="0.05"
             value={quality}
             onChange={e => setQuality(Number(e.target.value))}
-            className="range range-primary"
+            className="range"
+            style={{ 
+              '--range-shdw': primaryColor,
+              accentColor: primaryColor
+            } as React.CSSProperties}
             aria-label="Set image quality"
             title="Adjust image quality (higher value means better quality but larger file size)"
           />
         </div>
 
         <button
-          className="btn btn-primary w-full"
+          className="btn w-full text-white"
+          style={{ 
+            backgroundColor: primaryColor,
+            borderColor: primaryHoverColor
+          }}
           onClick={handleConvert}
           disabled={!images.length}
         >
@@ -186,27 +214,33 @@ const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode }) => {
 
       {showModal && (
         <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">Name your PDF</h3>
+          <div className="modal-box" style={{ backgroundColor: secondaryBgColor }}>
+            <h3 className="font-bold text-lg mb-4" style={{ color: primaryColor }}>Name your PDF</h3>
             <div className="flex items-center gap-2">
               <input
                 type="text"
                 value={fileName.replace(/\.pdf$/i, '')}
                 onChange={e => setFileName(e.target.value.replace(/\.pdf$/i, ''))}
                 className="input input-bordered flex-1"
+                style={{ borderColor: primaryColor, color: textColor }}
                 autoFocus
                 aria-label="PDF file name"
                 title="Enter name for your PDF file"
                 placeholder="Enter file name"
               />
-              <span className="text-lg font-semibold">.pdf</span>
+              <span className="text-lg font-semibold" style={{ color: textColor }}>.pdf</span>
             </div>
             <div className="modal-action">
-              <button className="btn btn-primary" onClick={handleDownload}>
+              <button 
+                className="btn text-white" 
+                style={{ backgroundColor: primaryColor }}
+                onClick={handleDownload}
+              >
                 Download
               </button>
               <button 
                 className="btn btn-ghost" 
+                style={{ color: textColor }}
                 onClick={() => setShowModal(false)}
               >
                 Cancel
