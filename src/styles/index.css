@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@plugin "daisyui";
+@tailwind utilities;
+
+/* Force light mode as default */
+:root {
+  color-scheme: light !important;
+}
+
+/* Override system preferences */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light !important;
+  }
+}
+
+/* Remove all transitions */
+* {
+  transition: none !important;
+}
+
+/* Theme variables */
+:root[data-theme="light"] {
+  --primary: #007bff;
+  --primary-hover: #0056b3;
+  --text: #000000;
+  --bg: #ffffff;
+}
+
+:root[data-theme="dark"] {
+  --primary: #ff0000;
+  --primary-hover: #cc0000;
+  --text: #ffffff;
+  --bg: #000000;
+}
