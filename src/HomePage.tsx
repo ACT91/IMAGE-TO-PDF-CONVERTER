@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { MdHome, MdSave, MdInfo, MdSettings, MdDarkMode, MdLightMode } from 'react-icons/md'
 import { useTheme } from './ThemeProvider'
 
-const HomePage: React.FC<HomePageProps> = ({ darkMode, setDarkMode }) => {
+const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const { theme, toggleTheme: toggleThemeContext } = useTheme();
@@ -57,7 +57,7 @@ const HomePage: React.FC<HomePageProps> = ({ darkMode, setDarkMode }) => {
 
           {/* Mobile Menu Button */}
           <button
-            className="btn btn-square btn-ghost md:hidden transition-colors duration-300"
+            className="btn btn-square btn-ghost md:hidden"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
@@ -175,9 +175,8 @@ const HomePage: React.FC<HomePageProps> = ({ darkMode, setDarkMode }) => {
       >
         {darkMode ? (
           <MdLightMode className="w-6 h-6" />
->>>>>>> recovery-branch
         ) : (
-          <MdDarkMode className="w-6 h-6 transition-transform duration-300" />
+          <MdDarkMode className="w-6 h-6" />
         )}
       </button>
     </div>
