@@ -6,9 +6,12 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
 <<<<<<< HEAD
+<<<<<<< HEAD
   theme: { extend: {} },
   plugins: [require('daisyui')],
 =======
+=======
+>>>>>>> recovery-branch
   darkMode: 'class', // Use class strategy for dark mode
   theme: {
     extend: {},
@@ -20,5 +23,8 @@ module.exports = {
     themes: ["light", "dark"],
     darkTheme: "dark" ,
   }
+<<<<<<< HEAD
+>>>>>>> recovery-branch
+=======
 >>>>>>> recovery-branch
 }
