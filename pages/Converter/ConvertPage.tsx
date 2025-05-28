@@ -19,70 +19,124 @@ interface ConvertPageProps {
   darkMode: boolean;
 }
 
-const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode: propDarkMode }) => {
+const ConvertPage: React.FC<ConvertPageProps> = () => {
   const { theme } = useTheme();
   const darkMode = theme === 'dark';
   
   const [images, setImages] = useState<File[]>([])
   const [paperSize, setPaperSize] = useState<string>('a4')
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait')
-  const [quality, setQuality] = useState<number>(0.95)
+  const [dimensionReduction, setDimensionReduction] = useState<number>(1.0)
+  const [compressionQuality, setCompressionQuality] = useState<number>(0.8)
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null)
   const [showModal, setShowModal] = useState<boolean>(false)
   const [fileName, setFileName] = useState<string>('images.pdf')
+  const [pdfSize, setPdfSize] = useState<string>('0 MB') // Track PDF size
+  const [isConverting, setIsConverting] = useState(false)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setImages(Array.from(e.target.files))
       setPdfBlob(null)
+      setPdfSize('0 MB')
     }
   }
+
+  // Function to reduce image quality
+  const reduceImageQuality = (file: File): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d')!;
+          
+          // Apply dimension reduction
+          canvas.width = img.width * dimensionReduction;
+          canvas.height = img.height * dimensionReduction;
+          
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // Apply compression quality
+          canvas.toBlob(
+            (blob) => resolve(blob!),
+            'image/jpeg',
+            compressionQuality
+          );
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
   const handleConvert = async () => {
-    if (!images.length) return
+    if (!images.length) return;
 
-    const doc = new jsPDF({
-      orientation,
-      unit: 'pt',
-      format: paperSize,
-    })
+    setIsConverting(true);
+    setPdfBlob(null);
+    setPdfSize('0 MB');
 
-    for (let i = 0; i < images.length; i++) {
-      const imgFile = images[i]
-      const imgData = await fileToDataUrl(imgFile)
-      const img = new window.Image()
-      img.src = imgData
-      await new Promise((res) => (img.onload = res))
+    try {
+      const doc = new jsPDF({
+        orientation,
+        unit: 'pt',
+        format: paperSize,
+      });
 
-      const pageWidth = doc.internal.pageSize.getWidth()
-      const pageHeight = doc.internal.pageSize.getHeight()
+      for (let i = 0; i < images.length; i++) {
+        const imgFile = images[i];
+        
+        // Step 1: Reduce image quality before adding to PDF
+        const reducedQualityImage = await reduceImageQuality(imgFile);
+        const imgData = await fileToDataUrl(reducedQualityImage);
+        
+        const img = new window.Image();
+        img.src = imgData;
+        await new Promise((res) => (img.onload = res));
 
-      let imgWidth = img.width
-      let imgHeight = img.height
-      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight)
-      imgWidth *= ratio
-      imgHeight *= ratio
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
 
-      if (i > 0) doc.addPage()
-      doc.addImage(
-        img,
-        'JPEG',
-        (pageWidth - imgWidth) / 2,
-        (pageHeight - imgHeight) / 2,
-        imgWidth,
-        imgHeight,
-        undefined,
-        'FAST',
-        quality
-      )
+        let imgWidth = img.width;
+        let imgHeight = img.height;
+        const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+        imgWidth *= ratio;
+        imgHeight *= ratio;
+
+        if (i > 0) doc.addPage();
+        doc.addImage(
+          img,
+          'JPEG',
+          (pageWidth - imgWidth) / 2,
+          (pageHeight - imgHeight) / 2,
+          imgWidth,
+          imgHeight
+        );
+      }
+
+      const blob = doc.output('blob');
+      setPdfBlob(blob);
+      setPdfSize(formatFileSize(blob.size));
+      setShowModal(true);
+    } catch (error) {
+      console.error('Conversion error:', error);
+    } finally {
+      setIsConverting(false);
     }
+  };
 
-    const blob = doc.output('blob')
-    setPdfBlob(blob)
-    setShowModal(true)
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  const fileToDataUrl = (file: File): Promise<string> => {
+  const fileToDataUrl = (file: File | Blob): Promise<string> => {
     return new Promise((resolve) => {
       const reader = new FileReader()
       reader.onload = (e) => {
@@ -175,24 +229,74 @@ const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode: propDarkMode }) => 
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text" style={{ color: textColor }}>Image Quality</span>
-            <span className="label-text-alt" style={{ color: textColor }}>{Math.round(quality * 100)}%</span>
+            <span className="label-text flex items-center" style={{ color: textColor }}>
+              Dimension Reduction {pdfBlob && `(Current: ${pdfSize})`}
+              <div className="tooltip tooltip-right ml-1" data-tip="Controls the actual size of images in pixels. Lower values create smaller files.">
+                <span style={{ color: primaryColor, cursor: 'help' }}>ⓘ</span>
+              </div>
+            </span>
+            <span className="label-text-alt" style={{ color: textColor }}>{Math.round(dimensionReduction * 100)}%</span>
+          </label>
+          <input
+            type="range"
+            min="0.3"
+            max="1"
+            step="0.05"
+            value={dimensionReduction}
+            onChange={e => setDimensionReduction(Number(e.target.value))}
+            className="range"
+            style={{ 
+              '--range-shdw': primaryColor,
+              accentColor: primaryColor
+            } as React.CSSProperties}
+            aria-label="Set dimension reduction"
+            title="Adjust image dimensions (higher value means larger images but better quality)"
+          />
+          <div className="flex justify-between text-xs px-2" style={{ color: textColor }}>
+            <span className="flex items-center">
+              Smaller Size
+              <div className="tooltip tooltip-right" data-tip="Reduces actual image dimensions. Lower values create smaller files but may lose detail.">
+                <span className="ml-1 cursor-help" style={{ color: primaryColor }}>ⓘ</span>
+              </div>
+            </span>
+            <span>Better Quality</span>
+          </div>
+        </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text flex items-center" style={{ color: textColor }}>
+              Compression Quality
+              <div className="tooltip tooltip-right ml-1" data-tip="Controls JPEG compression level. Lower values create smaller files but may reduce image clarity.">
+                <span style={{ color: primaryColor, cursor: 'help' }}>ⓘ</span>
+              </div>
+            </span>
+            <span className="label-text-alt" style={{ color: textColor }}>{Math.round(compressionQuality * 100)}%</span>
           </label>
           <input
             type="range"
             min="0.1"
             max="1"
             step="0.05"
-            value={quality}
-            onChange={e => setQuality(Number(e.target.value))}
+            value={compressionQuality}
+            onChange={e => setCompressionQuality(Number(e.target.value))}
             className="range"
             style={{ 
               '--range-shdw': primaryColor,
               accentColor: primaryColor
             } as React.CSSProperties}
-            aria-label="Set image quality"
-            title="Adjust image quality (higher value means better quality but larger file size)"
+            aria-label="Set compression quality"
+            title="Adjust JPEG compression (higher value means better quality but larger file size)"
           />
+          <div className="flex justify-between text-xs px-2" style={{ color: textColor }}>
+            <span className="flex items-center">
+              More Compression
+              <div className="tooltip tooltip-right" data-tip="Affects JPEG compression level. Lower values create smaller files but may introduce visible artifacts.">
+                <span className="ml-1 cursor-help" style={{ color: primaryColor }}>ⓘ</span>
+              </div>
+            </span>
+            <span>Less Artifacts</span>
+          </div>
         </div>
 
         <button
@@ -202,16 +306,22 @@ const ConvertPage: React.FC<ConvertPageProps> = ({ darkMode: propDarkMode }) => 
             borderColor: primaryHoverColor
           }}
           onClick={handleConvert}
-          disabled={!images.length}
+          disabled={!images.length || isConverting}
         >
-          Convert & Download PDF
+          {isConverting ? (
+            <span className="loading loading-spinner"></span>
+          ) : (
+            'Convert & Download PDF'
+          )}
         </button>
       </div>
 
       {showModal && (
         <div className="modal modal-open">
           <div className="modal-box" style={{ backgroundColor: secondaryBgColor }}>
-            <h3 className="font-bold text-lg mb-4" style={{ color: primaryColor }}>Name your PDF</h3>
+            <h3 className="font-bold text-lg mb-4" style={{ color: primaryColor }}>
+              PDF Ready! ({pdfSize})
+            </h3>
             <div className="flex items-center gap-2">
               <input
                 type="text"

@@ -1,6 +1,6 @@
 import { useNavigate, NavLink } from 'react-router-dom'
 import { useState } from 'react'
-import { MdHome, MdSave, MdInfo, MdSettings, MdDarkMode, MdLightMode } from 'react-icons/md'
+import { MdDarkMode, MdLightMode } from 'react-icons/md'
 import { useTheme } from './ThemeProvider'
 
 const HomePage: React.FC = () => {
@@ -32,17 +32,17 @@ const HomePage: React.FC = () => {
         
         <div className="flex-none">
           {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-1">
+          <div className="hidden md:flex space-x-2">
             {[
-              { to: "/", icon: <MdHome className="w-6 h-6" />, label: "Home" },
-              { to: "/saved", icon: <MdSave className="w-6 h-6" />, label: "Saved" },
-              { to: "/about", icon: <MdInfo className="w-6 h-6" />, label: "About" },
-              { to: "/settings", icon: <MdSettings className="w-6 h-6" />, label: "Settings" }
+              { to: "/", label: "Home" },
+              { to: "/saved", label: "Saved" },
+              { to: "/about", label: "About" },
+              { to: "/settings", label: "Settings" }
             ].map((item) => (
               <NavLink 
                 key={item.to}
                 to={item.to} 
-                className="btn btn-ghost btn-circle"
+                className="btn btn-ghost"
                 style={({ isActive }) => ({
                   backgroundColor: isActive ? (darkMode ? 'rgba(255,0,0,0.2)' : 'rgba(0,123,255,0.2)') : 'transparent',
                   color: isActive 
@@ -50,7 +50,7 @@ const HomePage: React.FC = () => {
                     : (darkMode ? '#ffffff' : '#000000')
                 })}
               >
-                {item.icon}
+                {item.label}
               </NavLink>
             ))}
           </div>
@@ -166,7 +166,7 @@ const HomePage: React.FC = () => {
       </main>
 
       <button
-        className="btn btn-circle btn-lg fixed bottom-17 right-8 text-white shadow-xl"
+        className="btn btn-circle btn-lg fixed bottom-8 right-8 text-white shadow-xl"
         style={{ 
           backgroundColor: darkMode ? '#ff0000' : '#007bff'
         }}
