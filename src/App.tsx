@@ -2,8 +2,8 @@ import { Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import HomePage from './HomePage';
 import ConvertPage from '../pages/Converter/ConvertPage';
-import { useTheme } from './ThemeProvider';
-
+import { useTheme } from '../scripts/ThemeProvider';
+import About from '../pages/About App/About';
 const App = () => {
   const { theme } = useTheme();
   const darkMode = theme === 'dark';
@@ -12,6 +12,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/convert" element={<ConvertPage darkMode={darkMode} />} />
+      <Route path="/about" element={<About />} />
     </Routes>
   );
 };

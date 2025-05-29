@@ -34,26 +34,30 @@ const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }, []);
 
   // Update document attributes and localStorage when theme changes
-  useEffect(() => {
-    console.log('Theme changed to:', theme);
-    
-    // Set data-theme attribute on html element
-    document.documentElement.setAttribute('data-theme', theme);
-    
-    // Also maintain dark class for Tailwind
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
-    // Save preference to localStorage
-    localStorage.setItem('theme', theme);
-    
-    // Force style recalculation
-    document.body.classList.remove('bg-white', 'dark:bg-black');
-    document.body.classList.add(theme === 'dark' ? 'bg-black' : 'bg-white');
-  }, [theme]);
+ useEffect(() => {
+  console.log('Theme changed to:', theme);
+
+  // Update HTML attributes
+  document.documentElement.setAttribute('data-theme', theme);
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+
+  // Save preference
+  localStorage.setItem('theme', theme);
+
+  // Update body background
+  document.body.classList.remove('bg-white', 'dark:bg-black');
+  document.body.classList.add(theme === 'dark' ? 'bg-black' : 'bg-white');
+
+  // 🔄 Update favicon dynamically
+  const favicon = document.getElementById('web-icon') as HTMLLinkElement | null;
+  if (favicon) {
+    favicon.href = theme === 'dark' ? '/red-icon.svg' : '/blue-icon.svg';
+  }
+}, [theme]);
 
   // Theme toggler function for context consumers
   const toggleTheme = () => {

@@ -1,7 +1,7 @@
 import { useNavigate, NavLink } from 'react-router-dom'
 import { useState } from 'react'
 import { MdDarkMode, MdLightMode } from 'react-icons/md'
-import { useTheme } from './ThemeProvider'
+import { useTheme } from '../scripts/ThemeProvider'
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();

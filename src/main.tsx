@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './styles/index.css';
-import ThemeProvider from './ThemeProvider'
+import ThemeProvider from '../scripts/ThemeProvider.tsx'
 
 // Force light theme on initial load
 document.documentElement.classList.remove('dark');
