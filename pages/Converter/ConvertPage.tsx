@@ -1,25 +1,17 @@
-import React from 'react';
-import { useState } from 'react';
-import { useTheme } from '../../scripts/ThemeProvider';
-import { handleConvert } from '../../scripts/imageConverter';
+import React, { useState } from 'react';
+import { useTheme } from "../../scripts/ThemeProvider";
+import { handleConvert } from "../../scripts/imageConverter";
 
-interface PaperSize {
-  label: string;
-  value: string;
+interface SavedPDF {
+  id: string;
+  fileName: string;
+  url: string;
+  createdAt: string;
+  size: string;
+  pageCount: number;
 }
 
-const paperSizes: PaperSize[] = [
-  { label: 'A4', value: 'a4' },
-  { label: 'A5', value: 'a5' },
-  { label: 'Letter', value: 'letter' },
-  { label: 'Legal', value: 'legal' },
-];
-
-interface ConvertPageProps {
-  darkMode: boolean;
-}
-
-const ConvertPage: React.FC<ConvertPageProps> = () => {
+const ConvertPage: React.FC = () => {
   const { theme } = useTheme();
   const darkMode = theme === 'dark';
   
@@ -56,6 +48,30 @@ const ConvertPage: React.FC<ConvertPageProps> = () => {
     setShowModal(false);
   };
 
+  const handleSaveAndDownload = async () => {
+    if (!pdfBlob) return;
+    
+    // Generate a unique ID for the PDF
+    const id = Date.now().toString();
+    
+    // Create the PDF object to save
+    const savedPDF: SavedPDF = {
+      id,
+      fileName: fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`,
+      url: URL.createObjectURL(pdfBlob),
+      createdAt: new Date().toISOString(),
+      size: pdfSize,
+      pageCount: images.length
+    };
+    
+    // Save to local storage
+    const existingPDFs = JSON.parse(localStorage.getItem('savedPDFs') || '[]');
+    localStorage.setItem('savedPDFs', JSON.stringify([...existingPDFs, savedPDF]));
+    
+    // Trigger download
+    handleDownload();
+  };
+
   // Theme-specific styles
   const primaryColor = darkMode ? '#ff0000' : '#007bff';
   const primaryHoverColor = darkMode ? '#cc0000' : '#0056b3';
@@ -69,85 +85,91 @@ const ConvertPage: React.FC<ConvertPageProps> = () => {
         className="w-full max-w-lg mx-auto space-y-6 p-6 sm:p-8 rounded-xl shadow-lg"
         style={{ backgroundColor: secondaryBgColor }}
       >
-        <h2
-          className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8"
-          style={{ color: primaryColor }}
-          >
-          Convert Image to PDF
+        <h2 
+          className="text-2xl font-bold text-center"
+          style={{ color: textColor }}
+        >
+          Convert Images to PDF
         </h2>
 
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text" style={{ color: textColor }}>
-              Choose Images
-            </span>
+        {/* File Input */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium" style={{ color: textColor }}>
+            Select Images
           </label>
           <input
             type="file"
-            accept="image/*"
             multiple
+            accept="image/*"
             onChange={handleImageChange}
             className="file-input file-input-bordered w-full"
-            style={{ borderColor: primaryColor }}
-            aria-label="Choose images to convert"
-            title="Select one or more images to convert to PDF"
+            style={{
+              backgroundColor: secondaryBgColor,
+              borderColor: darkMode ? '#333' : '#e5e7eb',
+              color: textColor
+            }}
           />
-              </div>
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text" style={{ color: textColor }}>
-              Paper Size
-            </span>
+          {images.length > 0 && (
+            <p className="text-sm opacity-70" style={{ color: textColor }}>
+              {images.length} image(s) selected
+            </p>
+          )}
+        </div>
+
+        {/* Paper Size */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium" style={{ color: textColor }}>
+            Paper Size
           </label>
           <select
-            className="select select-bordered w-full"
-                style={{ borderColor: primaryColor, color: textColor }}
             value={paperSize}
             onChange={(e) => setPaperSize(e.target.value)}
-            aria-label="Select paper size"
-            title="Choose the output PDF paper size"
-          >
-            {paperSizes.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-            </div>
-
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text" style={{ color: textColor }}>
-              Orientation
-            </span>
-          </label>
-          <select
             className="select select-bordered w-full"
-            style={{ borderColor: primaryColor, color: textColor }}
-            value={orientation}
-            onChange={(e) => setOrientation(e.target.value as 'portrait' | 'landscape')}
-            aria-label="Select page orientation"
-            title="Choose between portrait or landscape orientation"
+            style={{
+              backgroundColor: secondaryBgColor,
+              borderColor: darkMode ? '#333' : '#e5e7eb',
+              color: textColor
+            }}
           >
-            <option value="portrait">Portrait</option>
-            <option value="landscape">Landscape</option>
+            <option value="a4">A4</option>
+            <option value="letter">Letter</option>
+            <option value="legal">Legal</option>
           </select>
-    </div>
+        </div>
 
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text flex items-center" style={{ color: textColor }}>
-              Dimension Reduction {pdfBlob && `(Current: ${pdfSize})`}
-              <div
-                className="tooltip tooltip-right ml-1"
-                data-tip="Controls the actual size of images in pixels. Lower values create smaller files."
-              >
-                <span style={{ color: primaryColor, cursor: 'help' }}>ⓘ</span>
-              </div>
-            </span>
-            <span className="label-text-alt" style={{ color: textColor }}>
-              {Math.round(dimensionReduction * 100)}%
-            </span>
+        {/* Orientation */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium" style={{ color: textColor }}>
+            Orientation
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="portrait"
+                checked={orientation === 'portrait'}
+                onChange={(e) => setOrientation(e.target.value as 'portrait' | 'landscape')}
+                className="radio radio-primary mr-2"
+              />
+              <span style={{ color: textColor }}>Portrait</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="landscape"
+                checked={orientation === 'landscape'}
+                onChange={(e) => setOrientation(e.target.value as 'portrait' | 'landscape')}
+                className="radio radio-primary mr-2"
+              />
+              <span style={{ color: textColor }}>Landscape</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Dimension Reduction */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium" style={{ color: textColor }}>
+            Dimension Reduction: {Math.round(dimensionReduction * 100)}%
           </label>
           <input
             type="range"
@@ -156,46 +178,18 @@ const ConvertPage: React.FC<ConvertPageProps> = () => {
             step="0.05"
             value={dimensionReduction}
             onChange={(e) => setDimensionReduction(Number(e.target.value))}
-            className="range"
-            style={
-              {
-                '--range-shdw': primaryColor,
-                accentColor: primaryColor,
-              } as React.CSSProperties
-            }
-            aria-label="Set dimension reduction"
-            title="Adjust image dimensions (higher value means larger images but better quality)"
+            className="range range-primary"
           />
           <div className="flex justify-between text-xs px-2" style={{ color: textColor }}>
-            <span className="flex items-center">
-              Smaller Size
-              <div
-                className="tooltip tooltip-right"
-                data-tip="Reduces actual image dimensions. Lower values create smaller files but may lose detail."
-              >
-                <span className="ml-1 cursor-help" style={{ color: primaryColor }}>
-                  ⓘ
-                </span>
-              </div>
-            </span>
+            <span>Smaller Size</span>
             <span>Better Quality</span>
           </div>
         </div>
 
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text flex items-center" style={{ color: textColor }}>
-              Compression Quality
-              <div
-                className="tooltip tooltip-right ml-1"
-                data-tip="Controls JPEG compression level. Lower values create smaller files but may reduce image clarity."
-              >
-                <span style={{ color: primaryColor, cursor: 'help' }}>ⓘ</span>
-              </div>
-            </span>
-            <span className="label-text-alt" style={{ color: textColor }}>
-              {Math.round(compressionQuality * 100)}%
-            </span>
+        {/* Compression Quality */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium" style={{ color: textColor }}>
+            Compression Quality: {Math.round(compressionQuality * 100)}%
           </label>
           <input
             type="range"
@@ -204,90 +198,90 @@ const ConvertPage: React.FC<ConvertPageProps> = () => {
             step="0.05"
             value={compressionQuality}
             onChange={(e) => setCompressionQuality(Number(e.target.value))}
-            className="range"
-            style={
-              {
-                '--range-shdw': primaryColor,
-                accentColor: primaryColor,
-              } as React.CSSProperties
-            }
-            aria-label="Set compression quality"
-            title="Adjust JPEG compression (higher value means better quality but larger file size)"
+            className="range range-primary"
           />
           <div className="flex justify-between text-xs px-2" style={{ color: textColor }}>
-            <span className="flex items-center">
-              More Compression
-              <div
-                className="tooltip tooltip-right"
-                data-tip="Affects JPEG compression level. Lower values create smaller files but may introduce visible artifacts."
-              >
-                <span className="ml-1 cursor-help" style={{ color: primaryColor }}>
-                  ⓘ
-                </span>
-              </div>
-            </span>
+            <span>More Compression</span>
             <span>Less Artifacts</span>
           </div>
         </div>
 
+        {/* Convert Button */}
         <button
+          onClick={() => handleConvert(
+            images,
+            paperSize,
+            orientation,
+            dimensionReduction,
+            compressionQuality,
+            setPdfBlob,
+            setPdfSize,
+            setShowModal,
+            setIsConverting
+          )}
+          disabled={images.length === 0 || isConverting}
           className="btn w-full text-white"
           style={{
-            backgroundColor: primaryColor,
-            borderColor: primaryHoverColor,
+            backgroundColor: images.length === 0 || isConverting ? '#666' : primaryColor,
+            borderColor: images.length === 0 || isConverting ? '#666' : primaryColor
           }}
-          onClick={() =>
-            handleConvert(
-              images,
-              paperSize,
-              orientation,
-              dimensionReduction,
-              compressionQuality,
-              setPdfBlob,
-              setPdfSize,
-              setShowModal,
-              setIsConverting
-            )
-          }
-          disabled={!images.length || isConverting}
         >
           {isConverting ? (
-            <span className="loading loading-spinner"></span>
+            <>
+              <span className="loading loading-spinner loading-sm mr-2"></span>
+              Converting...
+            </>
           ) : (
-            'Convert & Download PDF'
+            'Convert to PDF'
           )}
         </button>
       </div>
 
+      {/* Success Modal */}
       {showModal && (
-        <div className="modal modal-open fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <div className="modal-box w-full max-w-md p-4 sm:p-6" style={{ backgroundColor: secondaryBgColor }}>
-            <h3 className="font-bold text-lg mb-4" style={{ color: primaryColor }}>
-              PDF Ready! ({pdfSize})
+        <div className="modal modal-open">
+          <div 
+            className="modal-box"
+            style={{ backgroundColor: secondaryBgColor }}
+          >
+            <h3 className="font-bold text-lg mb-4" style={{ color: textColor }}>
+              PDF Created Successfully! ({pdfSize})
             </h3>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={fileName.replace(/\.pdf$/i, '')}
-                onChange={(e) => setFileName(e.target.value.replace(/\.pdf$/i, ''))}
-                className="input input-bordered flex-1"
-                style={{ borderColor: primaryColor, color: textColor }}
-                autoFocus
-                aria-label="PDF file name"
-                title="Enter name for your PDF file"
-                placeholder="Enter file name"
-              />
-              <span className="text-base sm:text-lg font-semibold" style={{ color: textColor }}>
-                .pdf
-              </span>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: textColor }}>
+                  File Name
+                </label>
+                <input
+                  type="text"
+                  value={fileName.replace(/\.pdf$/i, '')}
+                  onChange={(e) => setFileName(e.target.value)}
+                  className="input input-bordered w-full"
+                  style={{
+                    backgroundColor: secondaryBgColor,
+                    borderColor: darkMode ? '#333' : '#e5e7eb',
+                    color: textColor
+                  }}
+                  placeholder="Enter file name"
+                />
+              </div>
             </div>
+
             <div className="modal-action mt-4 flex justify-end gap-2">
               <button
                 className="btn text-white"
                 style={{ backgroundColor: primaryColor }}
                 onClick={handleDownload}
               >
-                Download
+                Download Only
+              </button>
+              <button
+                className="btn text-white"
+                style={{ backgroundColor: darkMode ? '#4CAF50' : '#2E7D32' }}
+                onClick={handleSaveAndDownload}
+              >
+                Save & Download
               </button>
               <button
                 className="btn btn-ghost"
