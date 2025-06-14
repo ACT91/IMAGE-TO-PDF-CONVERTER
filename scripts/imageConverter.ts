@@ -52,13 +52,18 @@ export const handleConvert = async (
   setShowModal: (show: boolean) => void,
   setIsConverting: (isConverting: boolean) => void
 ): Promise<void> => {
-  if (!images.length) return;
+  if (!images.length) {
+    console.log("No images to convert");
+    return;
+  }
 
+  console.log("Starting conversion process");
   setIsConverting(true);
   setPdfBlob(null);
   setPdfSize('0 MB');
 
   try {
+    console.log("Creating jsPDF instance");
     const doc = new jsPDF({
       orientation,
       unit: 'pt',
@@ -66,15 +71,21 @@ export const handleConvert = async (
     });
 
     for (let i = 0; i < images.length; i++) {
+      console.log(`Processing image ${i+1} of ${images.length}`);
       const imgFile = images[i];
       
       // Step 1: Reduce image quality before adding to PDF
+      console.log("Reducing image quality");
       const reducedQualityImage = await reduceImageQuality(imgFile, dimensionReduction, compressionQuality);
+      console.log("Converting to data URL");
       const imgData = await fileToDataUrl(reducedQualityImage);
       
-      const img = new window.Image();
+      console.log("Loading image");
+      const img = new Image();
       img.src = imgData;
-      await new Promise((res) => (img.onload = res));
+      await new Promise<void>((res) => {
+        img.onload = () => res();
+      });
 
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
@@ -86,6 +97,7 @@ export const handleConvert = async (
       imgHeight *= ratio;
 
       if (i > 0) doc.addPage();
+      console.log("Adding image to PDF");
       doc.addImage(
         img,
         'JPEG',
@@ -96,13 +108,18 @@ export const handleConvert = async (
       );
     }
 
+    console.log("Generating PDF blob");
     const blob = doc.output('blob');
+    console.log("PDF created successfully, size:", blob.size);
     setPdfBlob(blob);
     setPdfSize(formatFileSize(blob.size));
+    
+    console.log("Setting show modal to true");
     setShowModal(true);
   } catch (error) {
     console.error('Conversion error:', error);
   } finally {
+    console.log("Conversion process completed");
     setIsConverting(false);
   }
 };

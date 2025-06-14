@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from "../../scripts/ThemeProvider";
 import { handleConvert } from "../../scripts/imageConverter";
 
@@ -49,7 +49,10 @@ const ConvertPage: React.FC = () => {
   };
 
   const handleSaveAndDownload = async () => {
-    if (!pdfBlob) return;
+    if (!pdfBlob) {
+      console.log("No PDF blob available");
+      return;
+    }
     
     // Generate a unique ID for the PDF
     const id = Date.now().toString();
@@ -71,10 +74,15 @@ const ConvertPage: React.FC = () => {
     // Trigger download
     handleDownload();
   };
+  
+  // Debug when PDF blob or modal state changes
+  useEffect(() => {
+    console.log("PDF Blob updated:", pdfBlob !== null);
+    console.log("Show modal:", showModal);
+  }, [pdfBlob, showModal]);
 
   // Theme-specific styles
   const primaryColor = darkMode ? '#ff0000' : '#007bff';
-  const primaryHoverColor = darkMode ? '#cc0000' : '#0056b3';
   const textColor = darkMode ? '#ffffff' : '#000000';
   const bgColor = darkMode ? '#000000' : '#ffffff';
   const secondaryBgColor = darkMode ? '#1a1a1a' : '#f8f9fa';
@@ -208,17 +216,27 @@ const ConvertPage: React.FC = () => {
 
         {/* Convert Button */}
         <button
-          onClick={() => handleConvert(
-            images,
-            paperSize,
-            orientation,
-            dimensionReduction,
-            compressionQuality,
-            setPdfBlob,
-            setPdfSize,
-            setShowModal,
-            setIsConverting
-          )}
+          onClick={(e) => {
+            e.preventDefault();
+            console.log("Convert button clicked");
+            console.log("Images:", images.length);
+            try {
+              handleConvert(
+                images,
+                paperSize,
+                orientation,
+                dimensionReduction,
+                compressionQuality,
+                setPdfBlob,
+                setPdfSize,
+                setShowModal,
+                setIsConverting
+              );
+            } catch (error) {
+              console.error("Conversion error:", error);
+              setIsConverting(false);
+            }
+          }}
           disabled={images.length === 0 || isConverting}
           className="btn w-full text-white"
           style={{
@@ -258,12 +276,13 @@ const ConvertPage: React.FC = () => {
                   value={fileName.replace(/\.pdf$/i, '')}
                   onChange={(e) => setFileName(e.target.value)}
                   className="input input-bordered w-full"
+                  aria-label="File name"
+                  placeholder="Enter file name"
                   style={{
                     backgroundColor: secondaryBgColor,
                     borderColor: darkMode ? '#333' : '#e5e7eb',
                     color: textColor
                   }}
-                  placeholder="Enter file name"
                 />
               </div>
             </div>
@@ -297,5 +316,4 @@ const ConvertPage: React.FC = () => {
     </div>
   );
 };
-
 export default ConvertPage;

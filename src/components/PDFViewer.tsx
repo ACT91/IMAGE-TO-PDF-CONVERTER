@@ -34,9 +34,15 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, fileName, onClose }) => {
     const printWindow = window.open(pdfUrl, '_blank');
     if (printWindow) {
       printWindow.onload = () => {
-        printWindow.print();
+        setTimeout(() => {
+          printWindow.print();
+        }, 1000);
       };
     }
+  };
+  
+  const handleView = () => {
+    window.open(pdfUrl, '_blank');
   };
 
   return (
@@ -94,6 +100,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, fileName, onClose }) => {
             {/* Action Buttons */}
             <button 
               className="btn btn-sm btn-ghost"
+              onClick={handleView}
+              title="View in Browser"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+            
+            <button 
+              className="btn btn-sm btn-ghost"
               onClick={handleDownload}
               title="Download"
             >
@@ -132,14 +149,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, fileName, onClose }) => {
           ) : (
             <div className="flex justify-center">
               <iframe
-                src={`${pdfUrl}#zoom=${scale * 100}`}
+                src={`${pdfUrl}#view=FitH&toolbar=1&navpanes=1&scrollbar=1&zoom=${scale * 100}`}
                 className="w-full h-full min-h-[600px] border rounded"
                 style={{ 
-                  transform: `scale(${scale})`,
                   transformOrigin: 'top center',
                   borderColor: darkMode ? '#333' : '#e5e7eb'
                 }}
                 title={fileName}
+                allow="fullscreen"
               />
             </div>
           )}

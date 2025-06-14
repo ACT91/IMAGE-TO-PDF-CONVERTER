@@ -271,16 +271,24 @@ const SavedPage: React.FC = () => {
                           </div>
 
                           <div className="flex gap-2">
-                            <button
-                              className="btn btn-sm btn-primary flex-1"
-                              onClick={() => setSelectedPDF(pdf)}
-                              style={{
-                                backgroundColor: darkMode ? '#ff0000' : '#007bff',
-                                borderColor: darkMode ? '#ff0000' : '#007bff'
-                              }}
-                            >
-                              View
-                            </button>
+                            <div className="flex gap-2 w-full">
+                              <button
+                                className="btn btn-sm btn-primary flex-1"
+                                onClick={() => setSelectedPDF(pdf)}
+                                style={{
+                                  backgroundColor: darkMode ? '#ff0000' : '#007bff',
+                                  borderColor: darkMode ? '#ff0000' : '#007bff'
+                                }}
+                              >
+                                View
+                              </button>
+                              <button
+                                className="btn btn-sm btn-outline"
+                                onClick={() => window.open(pdf.url, '_blank')}
+                              >
+                                Browser
+                              </button>
+                            </div>
                             <button
                               className="btn btn-sm btn-ghost text-error"
                               onClick={() => handleDeletePDF(pdf.id)}
@@ -344,16 +352,24 @@ const SavedPage: React.FC = () => {
                             </td>
                             <td>
                               <div className="flex gap-2">
-                                <button
-                                  className="btn btn-sm btn-primary"
-                                  onClick={() => setSelectedPDF(pdf)}
-                                  style={{
-                                    backgroundColor: darkMode ? '#ff0000' : '#007bff',
-                                    borderColor: darkMode ? '#ff0000' : '#007bff'
-                                  }}
-                                >
-                                  View
-                                </button>
+                                <div className="flex gap-2">
+                                  <button
+                                    className="btn btn-sm btn-primary"
+                                    onClick={() => setSelectedPDF(pdf)}
+                                    style={{
+                                      backgroundColor: darkMode ? '#ff0000' : '#007bff',
+                                      borderColor: darkMode ? '#ff0000' : '#007bff'
+                                    }}
+                                  >
+                                    View
+                                  </button>
+                                  <button
+                                    className="btn btn-sm btn-outline"
+                                    onClick={() => window.open(pdf.url, '_blank')}
+                                  >
+                                    Browser
+                                  </button>
+                                </div>
                                 <a
                                   href={pdf.url}
                                   download={pdf.fileName}
